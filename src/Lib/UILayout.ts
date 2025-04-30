@@ -59,8 +59,8 @@ export class UILayout {
       {
         name: "root",
         anchor: Vector.Zero,
-        width: this.screen.width,
-        height: this.screen.height,
+        width: this.screen.contentArea.width,
+        height: this.screen.contentArea.height,
         positionContentStrategy: "fixed",
         pos: vec(0, 0),
         padding: 0,
@@ -120,6 +120,8 @@ export class UIContainer extends ScreenElement {
   constructor(config: UIContainerArgs, emitter?: EventEmitter) {
     super(config);
 
+    console.log(`object: ${this.name}: ${this.width.toFixed(2)}x${this.height.toFixed(2)}`);
+
     if (emitter) this.uiEvents = emitter;
     if (config.layoutDirection) this._layoutDirection = config.layoutDirection;
     if (config.positionContentStrategy) this._positionContentStrategy = config.positionContentStrategy;
@@ -173,6 +175,10 @@ export class UIContainer extends ScreenElement {
   getChildContainer(index: number): UIContainer | null {
     if (index < 0 || index > this._childrenContainers.length) return null;
     return this._childrenContainers[index];
+  }
+
+  getChildByName(name: string): UIContainer | null {
+    return this._childrenContainers.find(child => child.name === name) || null;
   }
 
   getChildrenContainers(): Array<UIContainer> {
@@ -307,12 +313,18 @@ export class CenterPositioningStrategy extends PlacementStrategy {
     if (children.length === 0) return;
     if (children.some(child => !child.parentContainer)) return; // Exit the method early
     let parentWidth = children[0].parentDims.x;
+    let parentHeight = children[0].parentDims.y;
     let totalChildrenDimension = 0;
     let parent = children[0].parentContainer;
     let parentDims = children[0].parentDims;
 
     for (const child of children) {
-      totalChildrenDimension += child.getDimension().x;
+      if (this.layoutDirection === "horizontal") {
+        totalChildrenDimension += child.getDimension().x;
+      } else {
+        totalChildrenDimension += child.getDimension().y;
+      }
+
       //if last index don't add gap
       if (children.indexOf(child) !== children.length - 1) {
         if (this.layoutDirection === "horizontal") {
@@ -327,7 +339,7 @@ export class CenterPositioningStrategy extends PlacementStrategy {
     if (this.layoutDirection === "horizontal") {
       this.cursor.x = (parentWidth - totalChildrenDimension) / 2;
     } else {
-      this.cursor.y = (parentWidth - totalChildrenDimension) / 2;
+      this.cursor.y = (parentHeight - totalChildrenDimension) / 2;
     }
 
     for (const child of children) {
