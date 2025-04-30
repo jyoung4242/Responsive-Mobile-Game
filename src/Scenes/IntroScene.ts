@@ -20,11 +20,9 @@ export class IntroScene extends Scene {
     this.layout = new UILayout(context.engine);
     this.layout = updateUILayout(this.layout, context.engine, this.orientation);
 
-    this.resizeHandler = () => {
+    this.resizeHandler = async () => {
       this.orientation = getOrientation();
-      this.layout?.resetUI();
-      console.log("resize", this.orientation);
-
+      await this.layout?.resetUI();
       this.layout = updateUILayout(this.layout as UILayout, context.engine, this.orientation);
     };
     window.addEventListener("resize", this.resizeHandler);

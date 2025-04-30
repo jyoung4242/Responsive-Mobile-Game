@@ -4,7 +4,7 @@ import { c } from "vite/dist/node/moduleRunnerTransport.d-DJ_mE5sf";
 
 export function getPortraitLayout(layout: UILayout, engine: Engine) {
   console.log("getPortraitLayout", engine.screen.contentArea.width, engine.screen.contentArea.height);
-
+  if (layout.root.getChildrenContainers().length > 0) throw new Error("Landscape layout already exists");
   let TitleContainer = new UIContainer({
     pos: vec(0, 0),
     anchor: Vector.Zero,
@@ -22,7 +22,6 @@ export function getPortraitLayout(layout: UILayout, engine: Engine) {
 
   let largeButtonContainer = new UIContainer({
     pos: vec(0, 0),
-
     anchor: Vector.Zero,
     name: "ButtonContainerVerticalPositioningContainer",
     layoutDirection: "vertical",

@@ -1,4 +1,4 @@
-import { Engine, ScreenElement, ActorArgs, Vector, vec, Screen, GameEvent, EventEmitter, BoundingBox } from "excalibur";
+import { Engine, ScreenElement, ActorArgs, Vector, vec, Screen, GameEvent, EventEmitter, BoundingBox, Color } from "excalibur";
 
 export type PositionStrategy = "fixed" | "anchor-start" | "anchor-end" | "center" | "space-between" | "space-around" | "space-evenly";
 export type AlignmentStrategy = "center" | "anchor-start" | "anchor-end";
@@ -52,6 +52,8 @@ export class UILayout {
       this.engine = engine;
       this.screen = engine.screen;
       this.contentArea = this.screen.contentArea;
+      console.log("root container: ", this._rootContainer);
+
       this.layoutDirtyFlag = true;
     });
 
@@ -65,16 +67,36 @@ export class UILayout {
         pos: vec(0, 0),
         padding: 0,
         gap: 0,
+        color: Color.Transparent,
       },
+
       this.uiEvents
     );
 
     this.engine.add(this._rootContainer);
   }
 
-  resetUI() {
-    this.root.getChildrenContainers().forEach(child => child.kill());
-    this.layoutDirtyFlag = true;
+  async resetUI(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this._rootContainer.getChildrenContainers().forEach(child => child.kill());
+      this._rootContainer.kill();
+      this._rootContainer = new UIContainer({
+        name: "root",
+        anchor: Vector.Zero,
+        width: this.screen.contentArea.width,
+        height: this.screen.contentArea.height,
+        positionContentStrategy: "fixed",
+        pos: vec(0, 0),
+        padding: 0,
+        gap: 0,
+        color: Color.Transparent,
+      });
+      this.layoutDirtyFlag = true;
+      this._rootContainer.uiEvents = this.uiEvents;
+      console.log("camera: ", this.engine.currentScene.camera.pos);
+
+      resolve();
+    });
   }
 
   get root() {
@@ -120,7 +142,7 @@ export class UIContainer extends ScreenElement {
   constructor(config: UIContainerArgs, emitter?: EventEmitter) {
     super(config);
 
-    console.log(`object: ${this.name}: ${this.width.toFixed(2)}x${this.height.toFixed(2)}`);
+    //console.log(`object: ${this.name}: ${this.width.toFixed(2)}x${this.height.toFixed(2)}`);
 
     if (emitter) this.uiEvents = emitter;
     if (config.layoutDirection) this._layoutDirection = config.layoutDirection;
