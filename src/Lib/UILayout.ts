@@ -72,6 +72,11 @@ export class UILayout {
     this.engine.add(this._rootContainer);
   }
 
+  resetUI() {
+    this.root.getChildrenContainers().forEach(child => child.kill());
+    this.layoutDirtyFlag = true;
+  }
+
   get root() {
     return this._rootContainer;
   }
@@ -168,6 +173,10 @@ export class UIContainer extends ScreenElement {
   getChildContainer(index: number): UIContainer | null {
     if (index < 0 || index > this._childrenContainers.length) return null;
     return this._childrenContainers[index];
+  }
+
+  getChildrenContainers(): Array<UIContainer> {
+    return this._childrenContainers;
   }
 
   addChildContainer(child: UIContainer) {
