@@ -14,7 +14,7 @@ export function getPortraitLayout(layout: UILayout, engine: Engine) {
     alignmentContentStrategy: "center",
     width: engine.screen.contentArea.width,
     height: 40,
-    z: 1,
+    z: 2,
     color: Color.Red,
   });
 
@@ -32,6 +32,7 @@ export function getPortraitLayout(layout: UILayout, engine: Engine) {
     width: engine.screen.contentArea.width,
     height: engine.screen.contentArea.height,
     color: Color.Black,
+    z: 1,
   });
 
   layout.root.addChildContainer(largeButtonContainer);
